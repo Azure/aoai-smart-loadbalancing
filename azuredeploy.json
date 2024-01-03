@@ -1,0 +1,167 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "containerAppName": {
+            "type": "string",
+            "defaultValue": "[format('app-{0}', uniqueString(resourceGroup().id))]",
+            "metadata": {
+                "description": "Specifies the name of the container app."
+            }
+        },
+        "containerAppEnvName": {
+            "type": "string",
+            "defaultValue": "[format('env-{0}', uniqueString(resourceGroup().id))]",
+            "metadata": {
+                "description": "Specifies the name of the container app environment."
+            }
+        },
+        "location": {
+            "type": "string",
+            "defaultValue": "[resourceGroup().location]",
+            "metadata": {
+                "description": "Specifies the location for all resources."
+            }
+        },
+        "backend_1_url": {
+            "type": "string",
+            "minLength": 1,
+            "metadata": {
+                "description": "The URL of your first Azure OpenAI endpoint in the following format: https://[name].openai.azure.com"
+            }
+        },
+        "backend_1_priority": {
+            "type": "int",
+            "defaultValue": 1,
+            "metadata": {
+                "description": "The priority of your first OpenAI endpoint (lower number means higher priority)"
+            }
+        },
+        "backend_1_api_key": {
+            "type": "string",
+            "minLength": 1,
+            "metadata": {
+                "description": "The API key your secibd OpenAI endpoint"
+            }
+        },
+        "backend_2_url": {
+            "type": "string",
+            "minLength": 1,
+            "metadata": {
+                "description": "The URL of your second Azure OpenAI endpoint in the following format: https://[name].openai.azure.com"
+            }
+        },
+        "backend_2_priority": {
+            "type": "int",
+            "defaultValue": 2,
+            "metadata": {
+                "description": "The priority of your second OpenAI endpoint (lower number means higher priority)"
+            }
+        },
+        "backend_2_api_key": {
+            "type": "string",
+            "minLength": 1,
+            "metadata": {
+                "description": "The API key your second OpenAI endpoint"
+            }
+        }
+    },
+    "resources": [
+        {
+            "type": "Microsoft.App/managedEnvironments",
+            "apiVersion": "2022-06-01-preview",
+            "name": "[parameters('containerAppEnvName')]",
+            "location": "[parameters('location')]",
+            "sku": {
+                "name": "Consumption"
+            },
+            "properties": {}
+        },
+        {
+            "type": "Microsoft.App/containerApps",
+            "apiVersion": "2022-06-01-preview",
+            "name": "[parameters('containerAppName')]",
+            "location": "[parameters('location')]",
+            "properties": {
+                "managedEnvironmentId": "[resourceId('Microsoft.App/managedEnvironments', parameters('containerAppEnvName'))]",
+                "configuration": {
+                    "ingress": {
+                        "external": true,
+                        "targetPort": 8080,
+                        "allowInsecure": false,
+                        "traffic": [
+                            {
+                                "latestRevision": true,
+                                "weight": 100
+                            }
+                        ]
+                    }
+                },
+                "template": {
+                    "revisionSuffix": "firstrevision",
+                    "containers": [
+                        {
+                            "name": "[parameters('containerAppName')]",
+                            "image": "andredewes/aoai-smart-loadbalancing:v1",
+                            "resources": {
+                                "cpu": 1,
+                                "memory": "2Gi"
+                            },
+                            "env": [
+                                {
+                                    "name": "BACKEND_1_URL",
+                                    "value": "[parameters('backend_1_url')]"
+                                },
+                                {
+                                    "name": "BACKEND_1_PRIORITY",
+                                    "value": "[string(parameters('backend_1_priority'))]"
+                                },
+                                {
+                                    "name": "BACKEND_1_APIKEY",
+                                    "value": "[parameters('backend_1_api_key')]"
+                                },
+                                {
+                                    "name": "BACKEND_2_URL",
+                                    "value": "[parameters('backend_2_url')]"
+                                },
+                                {
+                                    "name": "BACKEND_2_PRIORITY",
+                                    "value": "[string(parameters('backend_2_priority'))]"
+                                },
+                                {
+                                    "name": "BACKEND_2_APIKEY",
+                                    "value": "[parameters('backend_2_api_key')]"
+                                }
+                            ]
+                        }
+                    ],
+                    "scale": {
+                        "minReplicas": 0,
+                        "maxReplicas": 10,
+                        "rules": [
+                            {
+                                "name": "cpu-50",
+                                "custom": {
+                                    "type": "cpu",
+                                    "metadata": {
+                                        "type": "Utilization",
+                                        "value": "50"
+                                    }
+                                }
+                            }
+                        ]
+                    }
+                }
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.App/managedEnvironments', parameters('containerAppEnvName'))]"
+            ]
+        }
+    ],
+    "outputs": {
+        "containerAppFQDN": {
+            "type": "string",
+            "value": "[reference(resourceId('Microsoft.App/containerApps', parameters('containerAppName'))).configuration.ingress.fqdn]"
+        }
+    }
+}

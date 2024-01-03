@@ -1,0 +1,35 @@
+{
+  "profiles": {
+    "https": {
+      "commandName": "Project",
+      "launchBrowser": true,
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "BACKEND_1_URL": "https://andre-openai-eastus.openai.azure.com",
+        "BACKEND_1_PRIORITY": "1",
+        "BACKEND_1_APIKEY": "your-api-key",
+        "BACKEND_2_URL": "https://andre-openai-eastus-2.openai.azure.com",
+        "BACKEND_2_PRIORITY": "1",
+        "BACKEND_2_APIKEY": "your-api-key",
+        "BACKEND_3_URL": "https://andre-openai-canadaeast.openai.azure.com",
+        "BACKEND_3_PRIORITY": "2",
+        "BACKEND_3_APIKEY": "your-api-key",
+        "BACKEND_4_URL": "https://andre-openai-francecentral.openai.azure.com/",
+        "BACKEND_4_PRIORITY": "3",
+        "BACKEND_4_APIKEY": "your-api-key",
+        "BACKEND_5_URL": "https://andre-openai-uksouth.openai.azure.com/",
+        "BACKEND_5_PRIORITY": "3",
+        "BACKEND_5_APIKEY": "your-api-key",
+        "BACKEND_6_URL": "https://andre-openai-westeurope.openai.azure.com/",
+        "BACKEND_6_PRIORITY": "3",
+        "BACKEND_6_APIKEY": "your-api-key",
+        "BACKEND_7_URL": "https://andre-openai-australia.openai.azure.com/",
+        "BACKEND_7_PRIORITY": "4",
+        "BACKEND_7_APIKEY": "your-api-key"
+      },
+      "dotnetRunMessages": true,
+      "applicationUrl": "https://localhost:7151"
+    }
+  },
+  "$schema": "https://json.schemastore.org/launchsettings.json"
+}
