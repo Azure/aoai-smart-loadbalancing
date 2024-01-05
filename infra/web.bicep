@@ -74,16 +74,15 @@ module app 'core/host/container-app.bicep' = {
     name: name
     location: location
     tags: tags
-    managedIdentity: true
-    //identityName: identityName
-    //ingressEnabled: true
+    identityName: identityName
+    ingressEnabled: true
     containerName: 'main'
     containerAppsEnvironmentName: containerAppsEnvironmentName
     containerRegistryName: containerRegistryName
     containerCpuCoreCount: '1'
     containerMemory: '2Gi'
-    //containerMinReplicas: 1
-    //containerMaxReplicas: 10
+    containerMinReplicas: 1
+    containerMaxReplicas: 10
     external: true
     env: [
       {

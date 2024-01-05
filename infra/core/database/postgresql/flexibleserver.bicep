@@ -1,3 +1,4 @@
+metadata description = 'Creates an Azure Database for PostgreSQL - Flexible Server.'
 param name string
 param location string = resourceGroup().location
 param tags object = {}
@@ -7,7 +8,6 @@ param storage object
 param administratorLogin string
 @secure()
 param administratorLoginPassword string
-param activeDirectoryAuth string = 'Disabled'
 param databaseNames array = []
 param allowAzureIPsFirewall bool = false
 param allowAllIPsFirewall bool = false
@@ -30,20 +30,6 @@ resource postgresServer 'Microsoft.DBforPostgreSQL/flexibleServers@2022-12-01' =
     highAvailability: {
       mode: 'Disabled'
     }
-    authConfig: {
-      activeDirectoryAuth: activeDirectoryAuth
-      passwordAuth: (administratorLoginPassword == null) ? 'Disabled' : 'Enabled'
-    }
-    backup: {
-      backupRetentionDays: 7
-      geoRedundantBackup: 'Disabled'
-    }
-    maintenanceWindow: {
-      customWindow: 'Disabled'
-      dayOfWeek: 0
-      startHour: 0
-      startMinute: 0
-    }
   }
 
   resource database 'databases' = [for name in databaseNames: {
@@ -53,24 +39,24 @@ resource postgresServer 'Microsoft.DBforPostgreSQL/flexibleServers@2022-12-01' =
   resource firewall_all 'firewallRules' = if (allowAllIPsFirewall) {
     name: 'allow-all-IPs'
     properties: {
-        startIpAddress: '0.0.0.0'
-        endIpAddress: '255.255.255.255'
+      startIpAddress: '0.0.0.0'
+      endIpAddress: '255.255.255.255'
     }
   }
 
   resource firewall_azure 'firewallRules' = if (allowAzureIPsFirewall) {
     name: 'allow-all-azure-internal-IPs'
     properties: {
-        startIpAddress: '0.0.0.0'
-        endIpAddress: '0.0.0.0'
+      startIpAddress: '0.0.0.0'
+      endIpAddress: '0.0.0.0'
     }
   }
 
   resource firewall_single 'firewallRules' = [for ip in allowedSingleIPs: {
     name: 'allow-single-${replace(ip, '.', '')}'
     properties: {
-        startIpAddress: ip
-        endIpAddress: ip
+      startIpAddress: ip
+      endIpAddress: ip
     }
   }]
 
