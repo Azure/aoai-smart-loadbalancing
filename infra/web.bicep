@@ -36,25 +36,25 @@ resource webIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-3
 }
 
 
-module containerAppsEnvironment 'core/host/container-apps-environment.bicep' = {
-  name: containerAppsEnvironmentName
-  params: {
-    name: containerAppsEnvironmentName
-    location: location
-    tags: tags
-    logAnalyticsWorkspaceName: logAnalyticsWorkspaceName
-    applicationInsightsName: applicationInsightsName
-  }
-}
+// module containerAppsEnvironment 'core/host/container-apps-environment.bicep' = {
+//   name: containerAppsEnvironmentName
+//   params: {
+//     name: containerAppsEnvironmentName
+//     location: location
+//     tags: tags
+//     logAnalyticsWorkspaceName: logAnalyticsWorkspaceName
+//     applicationInsightsName: applicationInsightsName
+//   }
+// }
 
-module containerRegistry 'core/host/container-registry.bicep' = {
-  name: containerRegistryName
-  params: {
-    name: containerRegistryName
-    location: location
-    tags: tags
-  }
-}
+// module containerRegistry 'core/host/container-registry.bicep' = {
+//   name: containerRegistryName
+//   params: {
+//     name: containerRegistryName
+//     location: location
+//     tags: tags
+//   }
+// }
 
 // Container apps host (including container registry)
 module containerApps 'core/host/container-apps.bicep' = {
@@ -66,10 +66,6 @@ module containerApps 'core/host/container-apps.bicep' = {
     containerRegistryName: containerRegistryName
     logAnalyticsWorkspaceName: logAnalyticsWorkspaceName
   }
-  dependsOn: [
-    containerAppsEnvironment
-    containerRegistry
-  ]
 }
 
 module app 'core/host/container-app.bicep' = {
@@ -126,6 +122,9 @@ module app 'core/host/container-app.bicep' = {
     imageName: 'andredewes/aoai-smart-loadbalancing:v1'
     targetPort: 8080
   }
+  dependsOn: [
+    containerApps
+  ]
 }
 
 resource applicationInsights 'Microsoft.Insights/components@2020-02-02' existing = {
