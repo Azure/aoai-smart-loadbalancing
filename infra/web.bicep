@@ -104,7 +104,7 @@ module app 'core/host/container-app.bicep' = {
         value: string(backend_1_priority)
       }
       {
-        name: 'BACKEND_1_API_KEY'
+        name: 'BACKEND_1_APIKEY'
         value: backend_1_api_key
       }
       {
@@ -116,7 +116,7 @@ module app 'core/host/container-app.bicep' = {
         value: string(backend_2_priority)
       }
       {
-        name: 'BACKEND_2_API_KEY'
+        name: 'BACKEND_2_APIKEY'
         value: backend_2_api_key
       }
     ]
