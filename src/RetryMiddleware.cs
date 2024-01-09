@@ -92,13 +92,13 @@ public class RetryMiddleware
         if (availableBackends.Count > 0)
         {
             //Returns a random backend from the list if we have more than one available with the same priority
-            backendIndex = availableBackends[new Random().Next(0, availableBackends.Count)];
+            backendIndex = availableBackends[Random.Shared.Next(0, availableBackends.Count)];
         }
         else
         {
             //Returns a random  backend if all backends are unhealthy
             _logger.LogWarning($"All backends are unhealthy. Picking a random backend...");
-            backendIndex = new Random().Next(0, allDestinations.Count);
+            backendIndex = Random.Shared.Next(0, allDestinations.Count);
         }
 
         var pickedDestination = allDestinations[backendIndex];
