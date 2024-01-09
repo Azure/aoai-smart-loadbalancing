@@ -1,0 +1,54 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "name": {
+            "value": "${AZURE_ENV_NAME}",
+            "metadata": {
+                "description": "Specifies the name of the app."
+            }
+        },
+        "location": {
+            "value": "${AZURE_LOCATION}",
+            "metadata": {
+                "description": "Specifies the location for all resources."
+            }
+        },
+        "backend_1_url": {
+            "value": "",
+            "metadata": {
+                "description": "The URL of your first Azure OpenAI endpoint in the following format: https://[name].openai.azure.com"
+            }
+        },
+        "backend_1_priority": {
+            "value": 1,
+            "metadata": {
+                "description": "The priority of your first OpenAI endpoint (lower number means higher priority)"
+            }
+        },
+        "backend_1_api_key": {
+            "value": "",
+            "metadata": {
+                "description": "The API key of your first OpenAI endpoint"
+            }
+        },
+        "backend_2_url": {
+            "value": "",
+            "metadata": {
+                "description": "The URL of your second Azure OpenAI endpoint in the following format: https://[name].openai.azure.com"
+            }
+        },
+        "backend_2_priority": {
+            "value": 2,
+            "metadata": {
+                "description": "The priority of your second OpenAI endpoint (lower number means higher priority)"
+            }
+        },
+        "backend_2_api_key": {
+            "value": "",
+            "metadata": {
+                "description": "The API key of your second OpenAI endpoint"
+            }
+        }
+    }
+}
