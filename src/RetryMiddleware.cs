@@ -15,6 +15,10 @@ public class RetryMiddleware
         _logger = loggerFactory.CreateLogger<RetryMiddleware>();
     }
 
+    /// <summary>
+    /// The code in this method is based on comments from https://github.com/microsoft/reverse-proxy/issues/56
+    /// When YARP natively supports retries, this will probably be greatly simplified.
+    /// </summary>
     public async Task InvokeAsync(HttpContext context)
     {
         context.Request.EnableBuffering();
@@ -52,6 +56,11 @@ public class RetryMiddleware
         return context.GetReverseProxyFeature().AllDestinations.Count(m => m.Health.Passive is DestinationHealth.Healthy or DestinationHealth.Unknown);
     }
 
+
+    /// <summary>
+    /// The native YARP ILoadBalancingPolicy interface does not play well with HTTP retries, that's why we're adding this custom load-balancing code.
+    /// This needs to be reevaluated to a ILoadBalancingPolicy implementation when YARP supports natively HTTP retries.
+    /// </summary>
     private DestinationState PickOneDestination(HttpContext context)
     {
         var reverseProxyFeature = context.GetReverseProxyFeature();

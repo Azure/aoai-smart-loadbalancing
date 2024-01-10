@@ -1,5 +1,6 @@
 using System.Net;
 using Yarp.ReverseProxy.Configuration;
+using Yarp.ReverseProxy.Forwarder;
 using Yarp.ReverseProxy.Health;
 using Yarp.ReverseProxy.Model;
 using Yarp.ReverseProxy.Transforms;
@@ -58,7 +59,8 @@ public class YarpConfiguration
                             Policy = ThrottlingHealthPolicy.ThrottlingPolicyName,
                         }
                     },
-                    Destinations = destinations
+                    Destinations = destinations,
+                    HttpRequest = new ForwarderRequestConfig { ActivityTimeout = TimeSpan.FromSeconds(BackendConfig.HttpTimeoutSeconds) }
                 }
         ];
     }
@@ -90,9 +92,22 @@ public class YarpConfiguration
         {
             var proxyHeaders = context.ProxyRequest.Headers;
             var reverseProxyFeature = context.HttpContext.GetReverseProxyFeature();
-            var apiKey = backends[reverseProxyFeature.AvailableDestinations[0].DestinationId].ApiKey;
+
+            var backendConfig = backends[reverseProxyFeature.AvailableDestinations[0].DestinationId];
             proxyHeaders.Remove("api-key");
-            proxyHeaders.Add("api-key", apiKey);
+            proxyHeaders.Add("api-key", backendConfig.ApiKey);
+
+            if (backendConfig.DeploymentName != null)
+            {
+                var pathSegments = context.Path.Value!.Split('/');
+
+                if (pathSegments.Length >= 4)
+                {
+                    //Incoming path should be coming in format "/openai/deployments/{deploymentName}/*"
+                    //We must grab the {deploynameName} from in the incoming request (array position [3]) and replace it by the one specified in the configuration
+                    context.Path = new PathString(context.Path.Value.Replace(pathSegments[3], backendConfig.DeploymentName));
+                }
+            }
             
             return default;
         };
