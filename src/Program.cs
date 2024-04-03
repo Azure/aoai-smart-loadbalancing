@@ -1,3 +1,4 @@
+using System.Net;
 using Yarp.ReverseProxy.Health;
 using Yarp.ReverseProxy.Transforms;
 
@@ -16,6 +17,15 @@ public class Program
         {
             m.AddRequestTransform(yarpConfiguration.TransformRequest());
             m.AddResponseTransform(yarpConfiguration.TransformResponse());
+        }).ConfigureHttpClient((_, handler) =>
+        {
+            var proxyUrl = Environment.GetEnvironmentVariable("HTTPS_PROXY");
+            if (!string.IsNullOrWhiteSpace(proxyUrl))
+            {
+                var proxy = new WebProxy(proxyUrl);
+                handler.Proxy = proxy;
+                handler.UseProxy = true;
+            }
         }).LoadFromMemory(yarpConfiguration.GetRoutes(), yarpConfiguration.GetClusters());
 
         builder.Services.AddHealthChecks();
