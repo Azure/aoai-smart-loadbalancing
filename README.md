@@ -6,7 +6,7 @@ Many service providers, including OpenAI, usually set limits on the number of ca
 
 The solution presented here is part of comprehensive one that takes into consideration things like a good UX/workflow design, adding application resiliency and fault-handling logic, considering service limits, choosing the right model for the job, the API policies, setting up logging and monitoring among other considerations. This solution seamlessly expose a single endpoint to your applications while keeping an efficient logic to consume two or more OpenAI or any API backends based on availability and priority.
 
-It is built using the high-performance [YARP C# reverse-proxy](https://github.com/microsoft/reverse-proxy) framework from Microsoft. However, you don't need to understand C# to use it, you can just build the provided Docker image.
+It is built using the high-performance [YARP C# reverse-proxy](https://github.com/microsoft/reverse-proxy) framework from Microsoft. However, you don't need to understand C# to use it, you can just build the provided Docker image. 
 This is an alternative solution to the [API Management OpenAI smart load balancer](https://github.com/andredewes/apim-aoai-smart-loadbalancing), with the same logic.
 
 ## :sparkles: Why do you call this "smart" and different from round-robin load balancers?
@@ -17,7 +17,7 @@ Together with that HTTP status code 429, Azure OpenAI will also return a HTTP re
 
 These errors are normally handled in the client-side by SDKs. This works great if you have a single API endpoint. However, for multiple OpenAI endpoints (used for fallback) you would need to manage the list of URLs in the client-side too, which is not ideal.
 
-What makes this solution different than others is that it is aware of the "Retry-After" and 429 errors and intelligently sends traffic to other OpenAI backends that are not currently throttling. You can even have a priority order in your backends, so the highest priority are the ones being consumed first while they are not throttling. When throttling kicks in, it will fallback to lower priority backends while your highest ones are waiting to recover.
+What makes this solution different than others is that it is aware of the "Retry-After" and 429 errors and intelligently sends traffic to other OpenAI backends that are not currently throttling. You can even have a priority order in your backends, so the highest priority are the ones being consumed first while they are not throttling. When throttling kicks in, it will fallback to lower priority backends while your highest ones are waiting to recover. 
 
 Another important feature: there is no time interval between attempts to call different backends. Many of other OpenAI load balancers out there configure a waiting internal (often exponential). While this is a good idea doing at the client side, making a server-side load balancer to wait is not a good practice because you hold your client and consume more server and network capacity during this waiting time. Retries on the server-side should be immediate and to a different endpoint.
 
@@ -145,7 +145,7 @@ This solution uses the local memory to store the endpoints health state. That me
 So, it might occur that internally, different instances will try route to throttled backends and will need to retry to another backend. Eventually, all instances will be in sync again at a small cost of unnecessary roundtrips to throttled endpoints.
 I honestly think this is a very small price to pay, but if you want to solve that you can always change the source code to use an external shared cache such as Redis, so all instances will share the same cached object.
 
-Having this in mind, be careful when you configure your hosting container service when it comes to scalability. For instance, the default scaling rules in a Azure Container Apps is the number of concurrent HTTP requests: if it is higher than 10, it will create another container instance. This effect is undesirable for the load balancer as it will create many instances, and that's why the Quick Deploy button in this repo changes that default behavior to only scale the container when CPU usage is higher than 50%.
+Having this in mind, be careful when you configure your hosting container service when it comes to scalability. For instance, the default scaling rules in a Azure Container Apps is the number of concurrent HTTP requests: if it is higher than 10, it will create another container instance. This effect is undesirable for the load balancer as it will create many instances, and that's why the Quick Deploy button in this repo changes that default behavior to only scale the container when CPU usage is higher than 50%. 
 
 ### Logging
 The default logging features coming from [YARP](https://microsoft.github.io/reverse-proxy/articles/diagnosing-yarp-issues.html) are not changed here, it is still applicable. For example, you should see these log lines being print in the container console (Stdout) when requests are sucesfully redirected to the backends:
