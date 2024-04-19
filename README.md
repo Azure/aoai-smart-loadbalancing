@@ -1,3 +1,7 @@
+> [!CAUTION]
+> This repository is moved to https://github.com/Azure-Samples/openai-aca-lb/
+
+
 ![Smart load balancing](./images/intro-loadbalance.png)
 
 # :rocket: Smart load balancing for OpenAI endpoints
